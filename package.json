@@ -1,0 +1,19 @@
+{
+  "name": "dom-lesson",
+  "version": "1.0.0",
+  "description": "Задание по работе с DOM",
+  "main": "index.js",
+  "scripts": {
+    "start": "open index.html",
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.atdcode.ru/templates/javascript-school/dom-private.git"
+  },
+  "keywords": [
+    "JS-school"
+  ],
+  "author": "GennadiyK",
+  "license": "ISC"
+}
