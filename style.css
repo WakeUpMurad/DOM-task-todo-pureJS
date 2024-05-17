@@ -82,6 +82,7 @@ button:disabled {
   max-width: 1440px;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
   margin-bottom: 2rem;
 }
 .filterBtn {
@@ -95,6 +96,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
+  margin-bottom: 2rem;
 }
 .table {
   width: 70%;
