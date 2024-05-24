@@ -24,7 +24,7 @@ const tasksData = [
 ]
 const tableHeadNames = ['Фамилия', 'Имя', 'Тема задания', 'Статус']
 
-const formlableNames = ['last name', 'name', 'task', 'status']
+const formlabelNames = ['last name', 'name', 'task', 'status']
 
 const filterBtnText = 'Отфильтровать выполненные задания'
 const otherFilterBtnText = 'Показать отфильтрованные задания'
@@ -120,41 +120,41 @@ const runApp = () => {
     rootElement.insertAdjacentElement('afterbegin', title)
   }
 
-  const renderForm = (rootElement, formlables) => {
+  const renderForm = (rootElement, formlabels) => {
     const formWrapper = document.createElement('div')
     formWrapper.classList.add('form-container')
 
     const form = document.createElement('form')
 
-    const makeFormlable = (lableName) => {
-      const lable = document.createElement('lable')
-      const lableTitle = document.createElement('h3')
-      lableTitle.textContent = lableName[0].toUpperCase() + lableName.slice(1)
-      lable.insertAdjacentElement('beforeend', lableTitle)
-      return lable
+    const makeFormlabel = (labelName) => {
+      const label = document.createElement('label')
+      const labelTitle = document.createElement('h3')
+      labelTitle.textContent = labelName[0].toUpperCase() + labelName.slice(1)
+      label.insertAdjacentElement('beforeend', labelTitle)
+      return label
     }
 
-    const makeFormSelectWithLable = (selectName) => {
+    const makeFormSelectWithlabel = (selectName) => {
       const select = createSelect()
       select.setAttribute('name', selectName)
-      const selectWithLable = makeFormlable(selectName)
-      selectWithLable.insertAdjacentElement('beforeend', select)
-      return selectWithLable
+      const selectWithlabel = makeFormlabel(selectName)
+      selectWithlabel.insertAdjacentElement('beforeend', select)
+      return selectWithlabel
     }
-    const makeFormInputWithLable = (inputName) => {
-      const inputWithLable = makeFormlable(inputName)
+    const makeFormInputWithlabel = (inputName) => {
+      const inputWithlabel = makeFormlabel(inputName)
       const input = createInput()
       input.setAttribute('placeholder', `Enter your ${inputName}`)
       input.setAttribute('name', inputName)
-      inputWithLable.insertAdjacentElement('beforeend', input)
-      return inputWithLable
+      inputWithlabel.insertAdjacentElement('beforeend', input)
+      return inputWithlabel
     }
 
-    formlables.forEach((name) => {
+    formlabels.forEach((name) => {
       if (name === 'status') {
-        form.insertAdjacentElement('beforeend', makeFormSelectWithLable(name))
+        form.insertAdjacentElement('beforeend', makeFormSelectWithlabel(name))
       } else {
-        form.insertAdjacentElement('beforeend', makeFormInputWithLable(name))
+        form.insertAdjacentElement('beforeend', makeFormInputWithlabel(name))
       }
     })
 
@@ -168,7 +168,7 @@ const runApp = () => {
       const form = event.target
       const formData = new FormData(form)
 
-      const formObjectData = formlables.reduce((acc, name) => {
+      const formObjectData = formlabels.reduce((acc, name) => {
         return (acc = { ...acc, [name]: formData.get(name) })
       }, {})
 
@@ -299,7 +299,7 @@ const runApp = () => {
 
   const initializeApp = (rootElem) => {
     renderTitle(rootElem)
-    renderForm(rootElem, formlableNames)
+    renderForm(rootElem, formlabelNames)
     renderFilterButton(rootElem, filterBtnText, otherFilterBtnText)
     renderTable(rootElem, tableHeadNames)
   }
