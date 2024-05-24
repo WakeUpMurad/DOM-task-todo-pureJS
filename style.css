@@ -25,7 +25,8 @@ h1 {
   margin: 0 auto;
   margin-bottom: 2rem;
 }
-.form {
+form {
+  position: relative;
   width: 50%;
   display: flex;
   flex-flow: wrap;
@@ -38,7 +39,7 @@ h1 {
   border-radius: 1rem;
 }
 
-label {
+lable {
   width: 48%;
   text-align: start;
   font-weight: 600;
@@ -51,7 +52,7 @@ input {
   width: 100%;
   font-size: 1rem;
   color: rgba(255, 255, 255, 1);
-  height: 2.5rem;
+  height: 1.5rem;
   padding: 0 1rem;
   border: none;
   border-radius: 0.2rem;
@@ -61,6 +62,25 @@ input {
 input::placeholder {
   color: rgba(255, 255, 255, 1);
 }
+input:required {
+  border: 2px solid red;
+}
+
+select {
+  width: 100%;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 1);
+  height: 1.5rem;
+  padding: 0 1rem;
+  border: none;
+  border-radius: 0.2rem;
+  outline: none;
+  background-color: #333;
+}
+select:required {
+  border: 2px solid red;
+}
+
 button {
   width: 100%;
   height: 3rem;
@@ -98,7 +118,8 @@ button:disabled {
   margin: 0 auto;
   margin-bottom: 2rem;
 }
-.table {
+
+table {
   width: 70%;
   color: rgba(0, 0, 0, 1);
   border-radius: 1rem;
@@ -117,6 +138,10 @@ th {
 tr {
   cursor: pointer;
 }
+tr:hover {
+  background-color: #d3d3d3;
+}
+
 tr th {
   border-radius: 1rem 0 0 1rem;
 }
@@ -133,18 +158,24 @@ td {
 tr td:last-child {
   border-radius: 0 1rem 1rem 0;
 }
-.errorInput {
-  border: 2px solid red;
-}
+
 .errorMessage {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 100%;
-  text-align: center;
+  padding: 0.5rem;
   color: red;
-}
-.hoverTR {
-  background-color: #d3d3d3;
 }
 
 .taskDone {
   background-color: #a9a9a9;
+}
+
+.table input {
+  background-color: #333;
+}
+
+.hiddenTask {
+  display: none;
 }
