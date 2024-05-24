@@ -2,247 +2,314 @@ document.addEventListener('DOMContentLoaded', function () {
   runApp()
 })
 
+const tasksData = [
+  {
+    lastName: 'Казанцев',
+    name: 'Геннадий',
+    task: 'Структуры данных',
+    status: 'Выполнено',
+  },
+  {
+    lastName: 'Гахраманов',
+    name: 'Мурад',
+    task: 'Алгоритмы',
+    status: 'Не выполнено',
+  },
+  {
+    lastName: 'Иванов',
+    name: 'Иван',
+    task: 'Архитектура',
+    status: 'Выполнено',
+  },
+]
+const tableHeadNames = ['Фамилия', 'Имя', 'Тема задания', 'Статус']
+
+const formlableNames = ['last name', 'name', 'task', 'status']
+
+const filterBtnText = 'Отфильтровать выполненные задания'
+const otherFilterBtnText = 'Показать отфильтрованные задания'
+
+const root = document.getElementById('root')
+
 const runApp = () => {
-  const tasksData = [
-    {
-      lastName: 'Казанцев',
-      name: 'Геннадий',
-      task: 'Структуры данных',
-      status: 'выполнено',
-    },
-    {
-      lastName: 'Гахраманов',
-      name: 'Мурад',
-      task: 'Алгоритмы',
-      status: 'не выполнено',
-    },
-    {
-      lastName: 'Ivanov',
-      name: 'Ivan',
-      task: 'Архитектура',
-      status: 'выполнено',
-    },
-  ]
-
-  const root = document.getElementById('root')
-
-  function makeNewTr({ lastName, name, task, status }) {
-    const tr = document.createElement('tr')
-    tr.addEventListener('mouseenter', (event) => {
-      event.target.classList.add('hoverTR')
-    })
-    tr.addEventListener('mouseleave', (event) => {
-      event.target.classList.remove('hoverTR')
-    })
-    const th = document.createElement('th')
-    th.setAttribute('scope', 'row')
-    th.textContent = lastName
-    tr.insertAdjacentElement('beforeend', th)
-    const tdName = document.createElement('td')
-    tdName.textContent = name
-    const tdTask = document.createElement('td')
-    tdTask.textContent = task
-    const tdStatus = document.createElement('td')
-    tdStatus.textContent = status
-    tr.insertAdjacentElement('beforeend', tdName)
-    tr.insertAdjacentElement('beforeend', tdTask)
-    tr.insertAdjacentElement('beforeend', tdStatus)
-    return tr
+  const createSelect = () => {
+    const select = document.createElement('select')
+    const defaultOption = document.createElement('option')
+    const optionOne = document.createElement('option')
+    const optionTwo = document.createElement('option')
+    defaultOption.innerText = 'Укажите статус'
+    defaultOption.setAttribute('selected', true)
+    defaultOption.setAttribute('hidden', true)
+    defaultOption.setAttribute('disabled', true)
+    select.insertAdjacentElement('beforeend', defaultOption)
+    optionOne.innerText = 'Не выполнено'
+    select.insertAdjacentElement('beforeend', optionOne)
+    optionTwo.innerText = 'Выполнено'
+    select.insertAdjacentElement('beforeend', optionTwo)
+    return select
   }
-  function addNewTr(tr, table) {
-    const filterButton = document.getElementById('filterBtn')
-    const newTr = makeNewTr(tr)
-    newTr.addEventListener('click', (event) => {
-      const parentElement = event.target.parentElement
-      if (parentElement.classList.contains('taskDone')) {
-        parentElement.classList.remove('taskDone')
-      } else {
-        parentElement.classList.add('taskDone')
-        if (filterButton.dataset.filtered === 'true') {
-          parentElement.setAttribute('style', 'display: none')
+  const createInput = () => {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'text')
+    return input
+  }
+  const handleClickTableRow = (event) => {
+    const parentElement = event.target.parentElement
+    parentElement.childNodes.forEach((elem, index) => {
+      if (index === parentElement.childNodes.length - 1) {
+        const select = createSelect()
+        select.onclick = (event) => event.stopPropagation()
+        select.ondblclick = (event) => event.stopPropagation()
+        select.onchange = (event) => {
+          parentElement.childNodes.forEach((elem) => (elem.textContent = elem.firstChild.value))
+          if (event.target.value === 'Выполнено') {
+            parentElement.classList.add('taskDone')
+          } else if (event.target.value === 'Не выполнено') {
+            parentElement.classList.remove('taskDone')
+          }
         }
-      }
-      const doneTasks = document.querySelectorAll('.taskDone')
-      if (doneTasks.length) {
-        filterButton.removeAttribute('disabled')
+        elem.textContent = ''
+        elem.insertAdjacentElement('beforeend', select)
       } else {
-        filterButton.setAttribute('disabled', 'true')
+        const input = createInput()
+        input.onclick = (event) => event.stopPropagation()
+        input.ondblclick = (event) => event.stopPropagation()
+        input.setAttribute('value', `${elem.innerText}`)
+        elem.textContent = ''
+        elem.insertAdjacentElement('beforeend', input)
       }
     })
-    newTr.addEventListener('dblclick', (event) => {
-      const parentElement = event.target.parentElement
-      parentElement.remove()
-    })
-    document.querySelectorAll('td').forEach((elem) => {
-      elem.addEventListener('click', (event) => {
-        console.log(event.target)
-      })
-    })
-    document.querySelectorAll('td').forEach((elem) => {
-      elem.addEventListener('dblclick', (event) => {
-        console.log(event.target)
-      })
-    })
-    table.insertAdjacentElement('beforeend', newTr)
+  }
+  const handleEnterPress = (event) => {
+    const parentElement = event.target.parentElement.parentElement
+    if (event.code === 'Enter') {
+      parentElement.childNodes.forEach((elem) => (elem.textContent = elem.firstChild.value))
+    }
+  }
+  const handleDblClickTableRow = (event) => {
+    const parentElement = event.target.parentElement
+    parentElement.remove()
   }
 
-  const renderTitle = () => {
+  const addNewTask = (newTask, tableToAdd) => {
+    const { lastName, name, task, status } = newTask
+    const tableRow = document.createElement('tr')
+    const tableHeader = document.createElement('th')
+    tableHeader.setAttribute('scope', 'row')
+    tableHeader.textContent = lastName
+    tableRow.insertAdjacentElement('beforeend', tableHeader)
+    const tableDataName = document.createElement('td')
+    tableDataName.textContent = name
+    const tableDataTask = document.createElement('td')
+    tableDataTask.textContent = task
+    const tableDataStatus = document.createElement('td')
+    if (status === 'Выполнено') {
+      tableRow.classList.add('taskDone')
+    }
+    tableDataStatus.textContent = status
+    tableRow.insertAdjacentElement('beforeend', tableDataName)
+    tableRow.insertAdjacentElement('beforeend', tableDataTask)
+    tableRow.insertAdjacentElement('beforeend', tableDataStatus)
+    const tableWithNewRow = tableToAdd.insertAdjacentElement('beforeend', tableRow)
+    return tableWithNewRow
+  }
+
+  const renderTitle = (rootElement) => {
     const title = document.createElement('h1')
     title.innerText = 'DOM lesson'
-    root.insertAdjacentElement('afterbegin', title)
+    rootElement.insertAdjacentElement('afterbegin', title)
   }
 
-  const renderForm = () => {
+  const renderForm = (rootElement, formlables) => {
     const formWrapper = document.createElement('div')
     formWrapper.classList.add('form-container')
 
     const form = document.createElement('form')
-    form.classList.add('form')
 
-    const makeFormLabel = (labelName) => {
-      const label = document.createElement('label')
-      const labelTitle = document.createElement('h3')
-      labelTitle.textContent = labelName[0].toUpperCase() + labelName.slice(1)
-      const input = document.createElement('input')
-      input.setAttribute('type', 'text')
-      input.setAttribute('name', labelName)
-      input.setAttribute('placeholder', `Enter your ${labelName}`)
-      label.insertAdjacentElement('beforeend', labelTitle)
-      label.insertAdjacentElement('beforeend', input)
-      return label
+    const makeFormlable = (lableName) => {
+      const lable = document.createElement('lable')
+      const lableTitle = document.createElement('h3')
+      lableTitle.textContent = lableName[0].toUpperCase() + lableName.slice(1)
+      lable.insertAdjacentElement('beforeend', lableTitle)
+      return lable
     }
 
-    const lastName = makeFormLabel('last name')
-    const name = makeFormLabel('name')
-    const task = makeFormLabel('task')
-    const status = makeFormLabel('status')
+    const makeFormSelectWithLable = (selectName) => {
+      const select = createSelect()
+      select.setAttribute('name', selectName)
+      const selectWithLable = makeFormlable(selectName)
+      selectWithLable.insertAdjacentElement('beforeend', select)
+      return selectWithLable
+    }
+    const makeFormInputWithLable = (inputName) => {
+      const inputWithLable = makeFormlable(inputName)
+      const input = createInput()
+      input.setAttribute('placeholder', `Enter your ${inputName}`)
+      input.setAttribute('name', inputName)
+      inputWithLable.insertAdjacentElement('beforeend', input)
+      return inputWithLable
+    }
+
+    formlables.forEach((name) => {
+      if (name === 'status') {
+        form.insertAdjacentElement('beforeend', makeFormSelectWithLable(name))
+      } else {
+        form.insertAdjacentElement('beforeend', makeFormInputWithLable(name))
+      }
+    })
+
     const button = document.createElement('button')
     button.setAttribute('type', 'submit')
-    button.textContent = 'Submit'
-
-    form.insertAdjacentElement('beforeend', lastName)
-    form.insertAdjacentElement('beforeend', name)
-    form.insertAdjacentElement('beforeend', task)
-    form.insertAdjacentElement('beforeend', status)
+    button.textContent = 'Добавить'
     form.insertAdjacentElement('beforeend', button)
 
-    form.addEventListener('submit', (event) => {
+    const handleFormSubmitData = (event) => {
       event.preventDefault()
       const form = event.target
       const formData = new FormData(form)
 
-      const name = formData.get('name')
-      const lastName = formData.get('last name')
-      const task = formData.get('task')
-      const status = formData.get('status')
+      const formObjectData = formlables.reduce((acc, name) => {
+        return (acc = { ...acc, [name]: formData.get(name) })
+      }, {})
 
-      const formObject = {
-        name: name,
-        'last name': lastName,
-        task: task,
-        status: status,
-      }
-
-      let hasError = false
-
-      for (const key in formObject) {
-        if (!formObject[key]) {
-          form[key].classList.add('errorInput')
-          hasError = true
-        } else {
-          form[key].classList.remove('errorInput')
+      const checkEmptyFormFields = (formData) => {
+        let hasEmpty = false
+        for (const key in formData) {
+          if (!formData[key]) {
+            form[key].setAttribute('required', true)
+            hasEmpty = true
+          } else {
+            form[key].removeAttribute('required')
+          }
         }
+        return hasEmpty
       }
 
-      if (hasError) {
-        const errorMessage = document.createElement('p')
+      const formError = document.getElementById('form-error')
+
+      const addErrorMsg = () => {
+        const errorMessage = document.createElement('div')
         errorMessage.classList.add('errorMessage')
         errorMessage.setAttribute('id', 'form-error')
         errorMessage.textContent = 'Не удалось добавить запись'
-        if (document.getElementById('form-error')) {
-          return
+        if (formError) {
+          return console.log('form has error')
         }
         return form.insertAdjacentElement('beforeend', errorMessage)
       }
-
-      const newTask = {
-        lastName,
-        name,
-        task,
-        status,
+      const pushNewTaskAndResetForm = () => {
+        const formatedFormData = {}
+        for (const key in formObjectData) {
+          if (key.includes(' ')) {
+            let formatedKey = key.split(' ').reduce((acc, el, i) => {
+              if (i > 0) {
+                return acc + el[0].toUpperCase() + el.slice(1)
+              }
+              return acc + el
+            }, '')
+            formatedFormData[formatedKey] = formObjectData[key]
+          } else {
+            formatedFormData[key] = formObjectData[key]
+          }
+        }
+        tasksData.push(formatedFormData)
+        filedTable([formatedFormData])
+        formError && formError.remove()
+        form.reset()
       }
-      const table = document.querySelector('.table')
-      addNewTr(newTask, table)
-      tasksData.push(newTask)
-      document.getElementById('form-error') ? document.getElementById('form-error').remove() : ''
-      form.reset()
-    })
 
+      checkEmptyFormFields(formObjectData) ? addErrorMsg() : pushNewTaskAndResetForm()
+    }
+
+    form.addEventListener('submit', (e) => handleFormSubmitData(e))
     formWrapper.insertAdjacentElement('afterbegin', form)
-    root.insertAdjacentElement('beforeend', formWrapper)
+    rootElement.insertAdjacentElement('beforeend', formWrapper)
   }
 
-  const renderFilterButton = () => {
+  const renderFilterButton = (rootElement, buttonText, buttonOtherText) => {
     const filterButton = document.createElement('button')
-    filterButton.textContent = 'Отфильтровать выполненные задания'
+    filterButton.textContent = buttonText
     filterButton.classList.add('filterBtn')
     filterButton.setAttribute('id', 'filterBtn')
-    filterButton.setAttribute('disabled', 'true')
 
-    filterButton.addEventListener('click', (event) => {
+    const handleFilterBtnClick = (event) => {
       const doneTasks = document.querySelectorAll('.taskDone')
       if (event.target.dataset.filtered === 'true') {
         event.target.dataset.filtered = false
-        event.target.textContent = 'Отфильтровать выполненные задания'
+        event.target.textContent = buttonText
         doneTasks.forEach((elem) => {
-          elem.setAttribute('style', 'display: table-row')
+          elem.classList.remove('hiddenTask')
         })
       } else {
         event.target.dataset.filtered = true
-        event.target.textContent = 'Показать отфильтрованные задания'
+        event.target.textContent = buttonOtherText
         doneTasks.forEach((elem) => {
-          elem.setAttribute('style', 'display: none')
+          elem.classList.add('hiddenTask')
         })
       }
-    })
+    }
+    filterButton.onclick = (e) => handleFilterBtnClick(e)
 
     const filterButtonWrapper = document.createElement('div')
     filterButtonWrapper.insertAdjacentElement('beforeend', filterButton)
     filterButtonWrapper.classList.add('filterBtn-container')
-    root.insertAdjacentElement('beforeend', filterButtonWrapper)
+    rootElement.insertAdjacentElement('beforeend', filterButtonWrapper)
   }
 
-  const renderTable = (tasks) => {
+  const renderTable = (rootElement, tableHeads) => {
     const tableWrapper = document.createElement('div')
     tableWrapper.classList.add('table-container')
-    const table = document.createElement('table')
-    table.classList.add('table')
+    const taskTable = document.createElement('table')
+    taskTable.setAttribute('id', 'table')
+    taskTable.onclick = (event) => {
+      if (event.target.getAttribute('scope') === 'col') {
+        return undefined
+      } else {
+        handleClickTableRow(event)
+      }
+    }
+    taskTable.ondblclick = (event) => {
+      if (event.target.getAttribute('scope') === 'col') {
+        return undefined
+      } else {
+        handleDblClickTableRow(event)
+      }
+    }
+    taskTable.onkeyup = (event) => {
+      if (event.code === 'Enter') {
+        handleEnterPress(event)
+      }
+    }
 
-    const tableHeadNames = ['Фамилия', 'Имя', 'Тема задания', 'Статус']
-
-    const tr = document.createElement('tr')
-
-    tableHeadNames.forEach((elem) => {
-      const th = document.createElement('th')
-      th.setAttribute('scope', 'col')
-      th.textContent = elem
-      tr.insertAdjacentElement('beforeend', th)
+    const thead = document.createElement('thead')
+    tableHeads.forEach((headName) => {
+      const tablehead = document.createElement('th')
+      tablehead.setAttribute('scope', 'col')
+      tablehead.textContent = headName
+      thead.insertAdjacentElement('beforeend', tablehead)
     })
-    table.insertAdjacentElement('beforeend', tr)
-
-    tasks.forEach((elem) => {
-      addNewTr(elem, table)
+    taskTable.insertAdjacentElement('beforeend', thead)
+    let observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => console.log(mutation.target, mutation.addedNodes))
     })
-    tableWrapper.insertAdjacentElement('afterbegin', table)
-    root.insertAdjacentElement('beforeend', tableWrapper)
+    observer.observe(taskTable, { childList: true })
+    tableWrapper.insertAdjacentElement('afterbegin', taskTable)
+    rootElement.insertAdjacentElement('beforeend', tableWrapper)
   }
 
-  const initializeApp = () => {
-    renderTitle()
-    renderForm()
-    renderFilterButton()
-    renderTable(tasksData)
+  const initializeApp = (rootElem) => {
+    renderTitle(rootElem)
+    renderForm(rootElem, formlableNames)
+    renderFilterButton(rootElem, filterBtnText, otherFilterBtnText)
+    renderTable(rootElem, tableHeadNames)
   }
-  initializeApp()
-  // Пишите код здесь
+  initializeApp(root)
+
+  const filedTable = (tasts) => {
+    const table = document.getElementById('table')
+    tasts.forEach((task) => {
+      addNewTask(task, table)
+    })
+  }
+  filedTable(tasksData)
 }
